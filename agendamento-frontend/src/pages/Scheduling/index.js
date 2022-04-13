@@ -1,11 +1,15 @@
 import dayjs from 'dayjs';
-import { Button, InputWrapper, Input , Title, Space } from "@mantine/core";
-import { TimeInput, DatePicker } from "@mantine/dates";
+import { Button, InputWrapper, Input , Title, Space, Select } from "@mantine/core";
+import { DatePicker } from "@mantine/dates";
 import { Calendar, Clock } from 'tabler-icons-react';
 import { useState } from "react";
 
 
 const SchedulingrForm = ({setForm, form}) => {
+
+    const date = new Date();
+
+    const time = new Date();
     
     return (
     <>
@@ -36,15 +40,35 @@ const SchedulingrForm = ({setForm, form}) => {
             placeholder="Select Date"
             label="Scheduling Date"
             dropdownType="modal"
-            minDate={dayjs(new Date()).startOf('month').add(12, 'days').toDate()}
+            minDate={dayjs(new Date()).startOf('month').add(date.getDate(), 'days').toDate()}
         />
 
-        <TimeInput
+<       Select
+            required
+            label="Choose the time of scheduling"
+            placeholder="Time"
+            data={[
+                { value: '4:00', label: '4:00'},
+                { value: '5:00', label: '5:00'},
+                { value: '6:00', label: '6:00'},
+                { value: '7:00', label: '7:00'},
+                { value: '8:00', label: '8:00'},
+                { value: '9:00', label: '9:00'},
+                { value: '10:00', label: '10:00'},
+                { value: '11:00', label: '11:00'},
+                { value: '12:00', label: '12:00'},
+                { value: '13:00', label: '13:00'},
+                { value: '14:00', label: '14:00'},
+            ]}
+            icon={<Clock size={16} />}
+        />
+        {/* <TimeInput
             required
             defaultValue={new Date()}
             label="Time"
             icon={<Clock size={16} />}
-        />
+            min="04:00"
+        /> */}
 
 
     </>
