@@ -8,8 +8,12 @@ import { useState } from "react";
 const SchedulingrForm = ({setForm, form}) => {
 
     const date = new Date();
+    //const [schedulingDate, setSchedulingDate] = useState('');
 
-    const time = new Date();
+    const time = Array(20).fill(0).map((_, index) => `${index+4}:00h`);
+    const disabled = Array(20).fill(0).map(() => false);
+    disabled[1] = true;
+
     
     return (
     <>
@@ -48,20 +52,20 @@ const SchedulingrForm = ({setForm, form}) => {
             label="Choose the time of scheduling"
             placeholder="Time"
             data={[
-                { value: '4:00', label: '4:00'},
-                { value: '5:00', label: '5:00'},
-                { value: '6:00', label: '6:00'},
-                { value: '7:00', label: '7:00'},
-                { value: '8:00', label: '8:00'},
-                { value: '9:00', label: '9:00'},
-                { value: '10:00', label: '10:00'},
-                { value: '11:00', label: '11:00'},
-                { value: '12:00', label: '12:00'},
-                { value: '13:00', label: '13:00'},
-                { value: '14:00', label: '14:00'},
+                {value: time[0], disabled: disabled[0]},
+                {value: time[1], disabled: disabled[1]},
+                {value: time[2], disabled: disabled[2]},
+                {value: time[3], disabled: disabled[3]},
             ]}
             icon={<Clock size={16} />}
         />
+         {/* <NumberInput
+            label="Choose the time of scheduling"
+            placeholder="Time" 
+            // min={4}
+            // max={23}
+            icon={<Clock size={18} />}
+            /> */}
         {/* <TimeInput
             required
             defaultValue={new Date()}
@@ -69,7 +73,6 @@ const SchedulingrForm = ({setForm, form}) => {
             icon={<Clock size={16} />}
             min="04:00"
         /> */}
-
 
     </>
     )
