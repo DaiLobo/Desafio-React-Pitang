@@ -10,9 +10,12 @@ const SchedulingrForm = ({setForm, form}) => {
     const date = new Date();
     //const [schedulingDate, setSchedulingDate] = useState('');
 
-    const time = Array(20).fill(0).map((_, index) => `${index+4}:00h`);
-    const disabled = Array(20).fill(0).map(() => false);
-    disabled[1] = true;
+    const time = Array(20).fill(0).map((_, index) => {
+       return {name: `${index+4}:00h`, disabled: true}
+    });
+    
+    // const disabled = Array(20).fill(0).map(() => false);
+    // disabled[1] = true;
 
     
     return (
@@ -44,19 +47,24 @@ const SchedulingrForm = ({setForm, form}) => {
             placeholder="Select Date"
             label="Scheduling Date"
             dropdownType="modal"
-            minDate={dayjs(new Date()).startOf('month').add(date.getDate(), 'days').toDate()}
+            minDate={dayjs(new Date()).startOf('month').add(date.getDate()-1, 'days').toDate()}
         />
 
 <       Select
             required
             label="Choose the time of scheduling"
             placeholder="Time"
-            data={[
-                {value: time[0], disabled: disabled[0]},
-                {value: time[1], disabled: disabled[1]},
-                {value: time[2], disabled: disabled[2]},
-                {value: time[3], disabled: disabled[3]},
-            ]}
+            // data={[
+            //     {value: time[0], disabled: disabled[0]},
+            //     {value: time[1], disabled: disabled[1]},
+            //     {value: time[2], disabled: disabled[2]},
+            //     {value: time[3], disabled: disabled[3]},
+            // ]}
+            data={
+                time.map((hour) => (
+                 {value: hour.name, label: hour.name, disabled: hour.disabled}
+                ))
+            }
             icon={<Clock size={16} />}
         />
          {/* <NumberInput
