@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Button, InputWrapper, Input , Title, Space, Select } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
-import { Calendar, Clock, Vaccine } from 'tabler-icons-react';
+import { AlertCircle, Calendar, Clock, Vaccine } from 'tabler-icons-react';
 import { showNotification } from '@mantine/notifications';
 import { useState } from "react";
 
@@ -117,7 +117,12 @@ const Scheduling = () => {
     const onSubmit = async (form) => {
 
         if(!form.name || !form.schedulingTime) {
-            return console.log("empty field");
+            return showNotification({
+                icon: <AlertCircle />,
+                title: "Error",
+                message: "Empty fields",
+                color: 'red',
+            });
         }
 
         const scheduling = {
