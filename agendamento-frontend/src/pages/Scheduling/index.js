@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import { Button, InputWrapper, Input , Title, Space, Select } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
-import { Calendar, Clock } from 'tabler-icons-react';
+import { Calendar, Clock, Vaccine } from 'tabler-icons-react';
+import { showNotification } from '@mantine/notifications';
 import { useState } from "react";
 
 
@@ -10,11 +11,11 @@ const time = Array(20).fill(0).map((_, index) => {
    return {name: `${index+4}:00h`, disabled: false, count: 0}
 });
 
-const SchedulingrForm = ({form, setForm}) => {
+
+const SchedulingForm = ({form, setForm}) => {
 
     const date = new Date();
     //const [schedulingDate, setSchedulingDate] = useState('');
-
     
     // const disabled = Array(20).fill(0).map(() => false);
     // disabled[1] = true;
@@ -33,8 +34,8 @@ const SchedulingrForm = ({form, setForm}) => {
     return (
     <>
         <InputWrapper
-            mb={8}
             id="name"
+            mb={8}
             required
             label="Name"
             description="Your full name"
@@ -48,6 +49,7 @@ const SchedulingrForm = ({form, setForm}) => {
         </InputWrapper>
 
         <DatePicker
+            id="birthDate"
             value={form.birthDate}
             onChange={(value) => onChange({target: {name: "birthDate", value}})}
             mb={8}
@@ -58,6 +60,7 @@ const SchedulingrForm = ({form, setForm}) => {
         />
 
         <DatePicker
+            id="schedulingDate"
             value={form.schedulingDate}
             onChange={(value) => onChange({target: {name: "schedulingDate", value}})}
             mb={8}
@@ -69,17 +72,12 @@ const SchedulingrForm = ({form, setForm}) => {
         />
 
 <       Select
+            id="schedulingTime"
             value={form.schedulingTime}
             onChange={(value) => onChange({ target: { name: "schedulingTime", value } })}
             required
             label="Choose the time of scheduling"
             placeholder="Time"
-            // data={[
-            //     {value: time[0], disabled: disabled[0]},
-            //     {value: time[1], disabled: disabled[1]},
-            //     {value: time[2], disabled: disabled[2]},
-            //     {value: time[3], disabled: disabled[3]},
-            // ]}
             data={
                 time.map((hour) => (
                  {value: hour.name, label: hour.name, disabled: hour.disabled}
@@ -112,11 +110,15 @@ const Scheduling = () => {
        name: '',
        birthDate: new Date(),
        schedulingDate: new Date(),
-       schedulingTime: new Date().getHours(),
+       schedulingTime: '',
     });
 
 
     const onSubmit = async (form) => {
+
+        if(!form.name || !form.schedulingTime) {
+            return console.log("empty field");
+        }
 
         const scheduling = {
             ...form,
@@ -124,16 +126,29 @@ const Scheduling = () => {
             schedulingDate: form.schedulingDate.toISOString(),
         };
 
+        // if (scheduling.name === ""){
+        //     return console.log(scheduling.name)
+        // }
+        //<Select error="Pick a time" />
+        //<Input error="Required field" />
+
         voucher.push(scheduling); //passo o objeto com as informações do formulario para um array
 
         const selected = time.findIndex((select) => select.name === voucher[voucher.length-1].schedulingTime); //encontro o index do select escolhido
 
-        if (time[selected].count === 1){
+        time[selected].count++;
+
+        if (time[selected].count === 2){
             time[selected].disabled = true;
         }
         
-        time[selected].count++;
-
+        showNotification({
+            icon: < Vaccine />,
+            title: "Success",
+            message: "Scheduling successful",
+            color: 'ocean-blue',
+        });
+        
 
     };
 
@@ -143,7 +158,7 @@ const Scheduling = () => {
             <Title order={5}> Scheduling </Title>
             <Space h="xl"/> 
 
-            <SchedulingrForm setForm={setForm} form={form} />
+            <SchedulingForm setForm={setForm} form={form} />
             
             <Button onClick={() => onSubmit(form)}
                     fullWidth
