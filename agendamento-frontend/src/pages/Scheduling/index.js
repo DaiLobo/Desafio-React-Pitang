@@ -1,16 +1,19 @@
 import dayjs from 'dayjs';
-import { Button, InputWrapper, Input , Title, Space, Select } from "@mantine/core";
+import { Button, Input , Title, Space, Select } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { AlertCircle, Calendar, Clock, Vaccine } from 'tabler-icons-react';
 import { showNotification } from '@mantine/notifications';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 const voucher = [];
+
 const time = Array(20).fill(0).map((_, index) => {
    return {name: `${index+4}:00h`, disabled: false, count: 0}
 });
 
+let isEmptyNameField = false;
+let isEmptyTimeField = false;
 
 const SchedulingForm = ({form, setForm}) => {
 
@@ -31,22 +34,37 @@ const SchedulingForm = ({form, setForm}) => {
         }));
     };
     
+    // useEffect(() => {
+    //     if (!form.schedulingTime){
+    //         isValidated = false;
+    //     }
+    // }, [])
+
     return (
     <>
-        <InputWrapper
-            id="name"
-            mb={8}
-            required
-            label="Name"
-            description="Your full name"
-        >
-        <Input
-            id="name"
-            name="name"
-            value={form.name}
-            onChange={onChange}
-        />
-        </InputWrapper>
+        {!isEmptyNameField ?
+            <Input
+                id="name"
+                mb={8}
+                required
+                label="Name"
+                description="Your full name"
+                name="name"
+                value={form.name}
+                onChange={onChange}
+            /> :
+            <Input
+                invalid
+                id="name"
+                mb={8}
+                required
+                label="Name"
+                description="Your full name"
+                name="name"
+                value={form.name}
+                onChange={onChange}
+            />
+        }
 
         <DatePicker
             id="birthDate"
@@ -71,20 +89,38 @@ const SchedulingForm = ({form, setForm}) => {
             minDate={dayjs(new Date()).startOf('month').add(date.getDate()-1, 'days').toDate()}
         />
 
-<       Select
-            id="schedulingTime"
-            value={form.schedulingTime}
-            onChange={(value) => onChange({ target: { name: "schedulingTime", value } })}
-            required
-            label="Choose the time of scheduling"
-            placeholder="Time"
-            data={
-                time.map((hour) => (
-                 {value: hour.name, label: hour.name, disabled: hour.disabled}
-                ))
-            }
-            icon={<Clock size={16} />}
-        />
+        {
+            !isEmptyTimeField ? 
+                <Select
+                    id="schedulingTime"
+                    value={form.schedulingTime}
+                    onChange={(value) => onChange({ target: { name: "schedulingTime", value } })}
+                    required
+                    label="Choose the time of scheduling"
+                    placeholder="Time"
+                    data={
+                        time.map((hour) => (
+                        {value: hour.name, label: hour.name, disabled: hour.disabled}
+                        ))
+                    }
+                    icon={<Clock size={16} />}
+                /> :
+                <Select
+                    error
+                    id="schedulingTime"
+                    value={form.schedulingTime}
+                    onChange={(value) => onChange({ target: { name: "schedulingTime", value } })}
+                    required
+                    label="Choose the time of scheduling"
+                    placeholder="Time"
+                    data={
+                        time.map((hour) => (
+                        {value: hour.name, label: hour.name, disabled: hour.disabled}
+                        ))
+                    }
+                    icon={<Clock size={16} />}
+                />
+         }
          {/* <NumberInput
             label="Choose the time of scheduling"
             placeholder="Time" 
@@ -113,17 +149,12 @@ const Scheduling = () => {
        schedulingTime: '',
     });
 
+    useEffect(() => {
+     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    const onSubmit = async (form) => {
-
-        if(!form.name || !form.schedulingTime) {
-            return showNotification({
-                icon: <AlertCircle />,
-                title: "Error",
-                message: "Empty fields",
-                color: 'red',
-            });
-        }
+    const onSubmit = async () => {
 
         const scheduling = {
             ...form,
@@ -131,28 +162,58 @@ const Scheduling = () => {
             schedulingDate: form.schedulingDate.toISOString(),
         };
 
-        // if (scheduling.name === ""){
-        //     return console.log(scheduling.name)
-        // }
-        //<Select error="Pick a time" />
-        //<Input error="Required field" />
-
         voucher.push(scheduling); //passo o objeto com as informações do formulario para um array
-
-        const selected = time.findIndex((select) => select.name === voucher[voucher.length-1].schedulingTime); //encontro o index do select escolhido
-
-        time[selected].count++;
-
-        if (time[selected].count === 2){
-            time[selected].disabled = true;
-        }
         
-        showNotification({
-            icon: < Vaccine />,
-            title: "Success",
-            message: "Scheduling successful",
-            color: 'ocean-blue',
-        });
+        const selected = time.findIndex((select) => select.name === voucher[voucher.length-1].schedulingTime); //encontro o index do select escolhido
+        // if (scheduling.name === ""){
+            //     return console.log(scheduling.name)
+            // }
+            //<Select error="Pick a time" />
+            //<Input error="Required field" />
+
+        try {
+            
+            if(!form.name || !form.schedulingTime) {
+                
+                return showNotification({
+                    icon: <AlertCircle />,
+                    title: "Error",
+                    message: `Empty ${(!form.name && !form.schedulingTime) ? "name and time fields" : 
+                                   `${!form.name ? "name": "time" } field` }`,
+                    color: 'red',
+                });
+            }
+            
+            if(selected >= 0) {
+               
+                time[selected].count++;
+                
+                if (time[selected].count === 2){
+                    time[selected].disabled = true;
+                }
+                
+                if (time[selected].count >= 3){
+                    return showNotification({
+                        icon: <AlertCircle />,
+                        title: "Error",
+                        message: "Unavailable hours" ,
+                        color: 'red',
+                    });
+                }
+                
+                showNotification({
+                    icon: < Vaccine />,
+                    title: "Success",
+                    message: "Scheduling successful: write down the day and time of your appointment" ,
+                    color: 'ocean-blue',
+                });   
+                
+            }
+
+
+        } catch (error){
+            console.log(error)
+        }
         
 
     };
@@ -165,7 +226,7 @@ const Scheduling = () => {
 
             <SchedulingForm setForm={setForm} form={form} />
             
-            <Button onClick={() => onSubmit(form)}
+            <Button onClick={() => onSubmit()}
                     fullWidth
                     variant="gradient" 
                     gradient={{ from: 'indigo', to: 'cyan' }}
