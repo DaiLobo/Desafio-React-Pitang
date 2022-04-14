@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Button, Input , Title, Space, Select } from "@mantine/core";
+import { Button, Title, Space, Select, InputWrapper, Input } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { AlertCircle, Calendar, Clock, Vaccine } from 'tabler-icons-react';
 import { showNotification } from '@mantine/notifications';
@@ -16,7 +16,7 @@ let isEmptyNameField = false;
 let isEmptyTimeField = false;
 
 const SchedulingForm = ({form, setForm}) => {
-
+    
     const date = new Date();
     //const [schedulingDate, setSchedulingDate] = useState('');
     
@@ -32,6 +32,7 @@ const SchedulingForm = ({form, setForm}) => {
         ...prevForm,
         [name]: value,
         }));
+
     };
     
     // useEffect(() => {
@@ -43,24 +44,28 @@ const SchedulingForm = ({form, setForm}) => {
     return (
     <>
         {!isEmptyNameField ?
-            <Input
+             <InputWrapper
                 id="name"
                 mb={8}
                 required
                 label="Name"
                 description="Your full name"
-                name="name"
-                value={form.name}
-                onChange={onChange}
-            /> :
-            <Input
+            >
+                <Input
+                    id="name"
+                    name="name"
+                    value={form.name}
+                    onChange={onChange}
+                />
+             </InputWrapper>
+            :
+            <InputWrapper
                 invalid
                 id="name"
                 mb={8}
                 required
                 label="Name"
                 description="Your full name"
-                name="name"
                 value={form.name}
                 onChange={onChange}
             />
@@ -87,6 +92,7 @@ const SchedulingForm = ({form, setForm}) => {
             label="Scheduling Date"
             dropdownType="modal"
             minDate={dayjs(new Date()).startOf('month').add(date.getDate()-1, 'days').toDate()}
+            excludeDate={(() => {})}
         />
 
         {
@@ -149,8 +155,11 @@ const Scheduling = () => {
        schedulingTime: '',
     });
 
+    // eslint-disable-next-line no-unused-vars
+    const [date, setDate] = useState(new Date())
+
     useEffect(() => {
-     
+ 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -163,6 +172,20 @@ const Scheduling = () => {
         };
 
         voucher.push(scheduling); //passo o objeto com as informações do formulario para um array
+
+        function dayLimit (data) {
+            return data.schedulingDate === scheduling.schedulingDate;
+        }
+        const limit = voucher.filter(dayLimit) //filtra todos os elementos que tem o mesmo dia que foi escolhido
+
+        console.log(limit.length)
+        console.log(voucher)
+
+    
+        if(limit.length >= 20){
+            setDate(form.schedulingDate);
+        }
+        
         
         const selected = time.findIndex((select) => select.name === voucher[voucher.length-1].schedulingTime); //encontro o index do select escolhido
         // if (scheduling.name === ""){
