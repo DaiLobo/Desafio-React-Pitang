@@ -6,14 +6,48 @@ import { showNotification } from '@mantine/notifications';
 import { useEffect, useState } from "react";
 
 
-const voucher = [];
+const DATA_FORM_KEY = "data_form";
 
-const time = Array(20).fill(0).map((_, index) => {
-   return {name: `${index+4}:00h`, disabled: false, count: 0}
+const voucher = [];
+let limit = [{name: '', birthDate: new Date(), schedulingDate: new Date(), schedulingTime: '',}]
+
+const time = Array(24).fill(0).map((_, index) => {
+   return {name: `${index}:00h`, disabled: false, count: 0}
 });
+
+// const hours = this.createRef();
 
 let isEmptyNameField = false;
 let isEmptyTimeField = false;
+
+
+
+//Pegando info do localStorage
+
+function getSaveInfo () {
+    const saveInfoStorage = localStorage.getItem(DATA_FORM_KEY)
+
+    if(!saveInfoStorage) return {
+        name: ' ',
+        birthDate: new Date(),
+        schedulingDate: new Date(),
+        schedulingTime: '',
+     };
+    else {
+        const data_saveInfoStorage = JSON.parse(saveInfoStorage);
+        return {
+            name: data_saveInfoStorage.name,
+            birthDate: new Date(data_saveInfoStorage.birthDate),
+            schedulingDate: new Date(data_saveInfoStorage.schedulingDate),
+            schedulingTime: data_saveInfoStorage.schedulingTime,
+        }
+    }
+    
+     //return JSON.parse(saveInfoStorage);
+
+}
+
+
 
 const SchedulingForm = ({form, setForm}) => {
     
@@ -34,7 +68,12 @@ const SchedulingForm = ({form, setForm}) => {
         }));
 
     };
-    
+  
+    // function handleDate(limit){
+    //     if(limit.length >= 20){
+    //         return true;
+    //     }
+    // }
     // useEffect(() => {
     //     if (!form.schedulingTime){
     //         isValidated = false;
@@ -92,7 +131,7 @@ const SchedulingForm = ({form, setForm}) => {
             label="Scheduling Date"
             dropdownType="modal"
             minDate={dayjs(new Date()).startOf('month').add(date.getDate()-1, 'days').toDate()}
-            excludeDate={(() => {})}
+            //excludeDate={(value) => limit.length >= 20}
         />
 
         {
@@ -148,20 +187,25 @@ const SchedulingForm = ({form, setForm}) => {
 
 const Scheduling = () => {
 
-    const [form, setForm] = useState({
-       name: '',
-       birthDate: new Date(),
-       schedulingDate: new Date(),
-       schedulingTime: '',
-    });
+    const [form, setForm] = useState(getSaveInfo);
 
     // eslint-disable-next-line no-unused-vars
-    const [date, setDate] = useState(new Date())
+    // const [date, setDate] = useState(new Date())
+
+    // useEffect(() => {
+ 
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
+
+
+
+    //Salvando no localStorage
 
     useEffect(() => {
- 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        localStorage.setItem(DATA_FORM_KEY, JSON.stringify(form))
+    }, [form])
+  
+
 
     const onSubmit = async () => {
 
@@ -176,23 +220,15 @@ const Scheduling = () => {
         function dayLimit (data) {
             return data.schedulingDate === scheduling.schedulingDate;
         }
-        const limit = voucher.filter(dayLimit) //filtra todos os elementos que tem o mesmo dia que foi escolhido
+        
+        limit = voucher.filter(dayLimit) //filtra todos os elementos que tem o mesmo dia que foi escolhido
 
         console.log(limit.length)
         console.log(voucher)
-
-    
-        if(limit.length >= 20){
-            setDate(form.schedulingDate);
-        }
         
+        //console.log(hours.current)
         
         const selected = time.findIndex((select) => select.name === voucher[voucher.length-1].schedulingTime); //encontro o index do select escolhido
-        // if (scheduling.name === ""){
-            //     return console.log(scheduling.name)
-            // }
-            //<Select error="Pick a time" />
-            //<Input error="Required field" />
 
         try {
             
