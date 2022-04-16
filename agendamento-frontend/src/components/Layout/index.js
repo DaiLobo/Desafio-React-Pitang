@@ -1,4 +1,4 @@
-import { AppShell, Navbar, Header, Group } from "@mantine/core";
+import { AppShell, Navbar, Header, Group, Title } from "@mantine/core";
 import { Outlet } from "react-router-dom";
 import MainLinks from "./MainLinks";
 
@@ -18,7 +18,7 @@ const Layout = () => {
       header={
         <Header height={60}>
           <Group sx={{ height: "100%" }} px={20} position="center">
-            Agendamento da Vacina do COVID-19
+          <Title order={4}> Agendamento da Vacina do COVID-19 </Title>
           </Group>
         </Header>
       }
