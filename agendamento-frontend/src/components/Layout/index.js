@@ -18,7 +18,7 @@ const Layout = () => {
       header={
         <Header height={60}>
           <Group sx={{ height: "100%" }} px={20} position="center">
-          <Title order={4}> Agendamento da Vacina do COVID-19 </Title>
+          <Title order={4}> COVID-19 Vaccine Scheduling </Title>
           </Group>
         </Header>
       }
