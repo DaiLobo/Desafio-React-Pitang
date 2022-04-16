@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import * as yup from 'yup';
+import axios from "../../services/api";
 import { Button, Title, Space, Select, InputWrapper, Input } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { AlertCircle, Calendar, Clock, Vaccine } from 'tabler-icons-react';
@@ -199,6 +200,7 @@ const Scheduling = () => {
 
         try {
             await schema.validate(form);
+            await axios.post("/scheduling", form);
             notification();
             return true;
         } catch (error){
@@ -233,6 +235,16 @@ const Scheduling = () => {
 
 
         //FAZER A REQUISIÇÃO PARA O BACK
+        // try {
+        //     if(!(await validate())) {
+        //         await axios.put(`/ticket/${form.id}`, form);
+        //     }
+        // } catch(error) {
+
+        // }
+
+
+
     };
 
     return (

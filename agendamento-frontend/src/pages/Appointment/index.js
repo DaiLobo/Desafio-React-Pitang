@@ -1,6 +1,33 @@
 import {Button, Space, Switch, Table, Title} from "@mantine/core";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "../../services/api";
 
 const Appointment = () => {
+
+    const [scheduling, setScheduling] = useState([]);
+    const [checked, setChecked] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        
+        axios.get("/schedule").then((response) => setScheduling(response.data));
+
+    }, []);
+
+    console.log(checked)
+
+    function attended (checked){
+        axios.post("/scheduling", checked);
+    }
+
+    // const scheduling = {
+    //     id: 1,
+    //     name: "Diana",
+    //     birthdate: "09/06/1998",
+    //     schedulingDate: "15/04/2022",
+    //     schedulingTime: "16h"
+    // }
    
     return (
         <>
@@ -17,17 +44,20 @@ const Appointment = () => {
                     </tr>
                 </thead> 
                 <tbody>
-                    {/* {users.map((user, index) => ( */}
+                    {/* {scheduling.map((schedule, index) => ( */}
                         <tr key={''}>
-                            <td>{}</td>
-                            <td>{}</td>
-                            <td>{}</td>
-                            <td>{}</td>
-                            <td>{}</td>
+                            <td>{scheduling.id}</td>
+                            <td>{scheduling.name}</td>
+                            <td>{scheduling.birthdate}</td>
+                            <td>{scheduling.schedulingDate}</td>
+                            <td>{scheduling.schedulingTime}</td>
                             <td>
-                            <Switch 
+                            <Switch
+                                onClick={() => attended()}
                                 label="Attended"
                                 color="indigo"
+                                checked={checked}
+                                onChange={(event) => setChecked(event.currentTarget.checked)}
                             />
                             </td>
                         </tr>
@@ -36,10 +66,10 @@ const Appointment = () => {
             </Table>
 
             <Space h="xl"/>
-            <Button onClick={() => {}} 
+            <Button onClick={() => navigate("/scheduling")} 
                     variant="gradient" 
                     gradient={{ from: 'indigo', to: 'cyan' }} 
-                    size="xs">
+                    size="sm">
                 Schedule
             </Button>
 
