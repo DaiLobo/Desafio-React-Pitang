@@ -18,7 +18,7 @@ const Appointment = () => {
     console.log(checked)
 
     function attended (checked){
-        axios.post("/scheduling", checked);
+        axios.put("/schedule", checked); //colocar id
     }
 
     // const scheduling = {
