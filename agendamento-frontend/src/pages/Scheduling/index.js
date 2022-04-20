@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import * as yup from 'yup';
+import axios from "../../services/api";
 import { Button, Title, Space, Select, InputWrapper, Input } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { AlertCircle, Calendar, Clock, Vaccine } from 'tabler-icons-react';
@@ -10,7 +11,7 @@ import { useEffect, useState } from "react";
 const DATA_FORM_KEY = "data_form";
 
 const voucher = [];
-//let limit = [{name: '', birthDate: new Date(), schedulingDate: new Date(), schedulingTime: '',}]
+//let limit = [{name: '', birthDate: new Date(), schedulingDateTime: new Date(), schedulingTime: '',}]
 
 const time = Array(24).fill(0).map((_, index) => {
    return {name: `${index}:00h`, disabled: false, count: 0}
@@ -27,7 +28,7 @@ function getSaveInfo () {
     if(!saveInfoStorage) return {
         name: '',
         birthDate: new Date(),
-        schedulingDate: new Date(),
+        schedulingDateTime: new Date(),
         schedulingTime: '',
      };
     else {
@@ -35,7 +36,7 @@ function getSaveInfo () {
         return {
             name: data_saveInfoStorage.name,
             birthDate: new Date(data_saveInfoStorage.birthDate),
-            schedulingDate: new Date(data_saveInfoStorage.schedulingDate),
+            schedulingDateTime: new Date(data_saveInfoStorage.schedulingDateTime),
             schedulingTime: data_saveInfoStorage.schedulingTime,
         }
     }
@@ -101,10 +102,10 @@ const SchedulingForm = ({form, setForm}) => {
         />
 
         <DatePicker
-            id="schedulingDate"
-            name="schedulingDate"
-            value={form.schedulingDate}
-            onChange={(value) => onChange({target: {name: "schedulingDate", value}})}
+            id="schedulingDateTime"
+            name="schedulingDateTime"
+            value={form.schedulingDateTime}
+            onChange={(value) => onChange({target: {name: "schedulingDateTime", value}})}
             mb={8}
             required
             placeholder="Select Date"
@@ -193,12 +194,13 @@ const Scheduling = () => {
         const schema = yup.object().shape({
             name: yup.string().required(),
             birthDate: yup.date().required(),
-            schedulingDate: yup.date().required(),
+            schedulingDateTime: yup.date().required(),
             schedulingTime: yup.string().required(),
         })
 
         try {
             await schema.validate(form);
+            await axios.post("/schedule", form);
             notification();
             return true;
         } catch (error){
@@ -212,14 +214,14 @@ const Scheduling = () => {
         const scheduling = {
             ...form,
             birthDate: form.birthDate.toISOString(),
-            schedulingDate: form.schedulingDate.toISOString(),
+            schedulingDateTime: form.schedulingDateTime.toISOString(),
         };
 
         voucher.push(scheduling); //passo o objeto com as informações do formulário para um array
    
         //Limite de 20 agendamentos por dia
         // function dayLimit (data) {
-        //     return data.schedulingDate === scheduling.schedulingDate;
+        //     return data.schedulingDateTime === scheduling.schedulingDateTime;
         // }
         // limit = voucher.filter(dayLimit) //filtra todos os elementos que tem o mesmo dia que foi escolhido
 
@@ -233,6 +235,16 @@ const Scheduling = () => {
 
 
         //FAZER A REQUISIÇÃO PARA O BACK
+        // try {
+        //     if(!(await validate())) {
+        //         await axios.put(`/ticket/${form.id}`, form);
+        //     }
+        // } catch(error) {
+
+        // }
+
+
+
     };
 
     return (
