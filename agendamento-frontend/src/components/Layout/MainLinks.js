@@ -40,7 +40,7 @@ function MainLink({ icon, color, label, path }) {
 const routes = [
     {icon: <Home size={16} />, color: "blue", label: "Home", path: "/" },
     {icon: <CalendarEvent size={16} />, color: "teal", label: "Agendamento de Pacientes", path: "/scheduling"},
-    {icon: <ClipboardList size={16} />, color: "violet", label: "Consulta dos Agendamentos", path: "/consult"},    
+    {icon: <ClipboardList size={16} />, color: "violet", label: "Consulta dos Agendamentos", path: "/appointment"},    
 ]
 
 export default function MainLinks() {
