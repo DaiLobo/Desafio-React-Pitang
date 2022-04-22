@@ -1,10 +1,11 @@
 import {Button, Space, Switch, Table, Title} from "@mantine/core";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "../../services/api";
 
 const Appointment = () => {
 
+    const {scheduleId} = useParams();
     const [scheduling, setScheduling] = useState([]);
     const [checked, setChecked] = useState(false);
     const navigate = useNavigate();
@@ -17,8 +18,8 @@ const Appointment = () => {
 
     console.log(checked)
 
-    function attended (checked){
-        axios.put("/schedule", checked); //colocar id
+    const attended = async (checked) => {
+        await axios.put(`/schedule/${scheduleId}`, checked); //colocar id
     }
 
     // const scheduling = {
@@ -38,19 +39,17 @@ const Appointment = () => {
                         <th>Id</th>
                         <th>Name</th>
                         <th>Birthdate</th>
-                        <th>Scheduling Date</th>
-                        <th>Time</th>
+                        <th>Scheduling Date and Time</th>
                         <th>Conclusion of the service</th>
                     </tr>
                 </thead> 
                 <tbody>
-                    {/* {scheduling.map((schedule, index) => ( */}
-                        <tr key={''}>
-                            <td>{scheduling.id}</td>
-                            <td>{scheduling.name}</td>
-                            <td>{scheduling.birthdate}</td>
-                            <td>{scheduling.schedulingDate}</td>
-                            <td>{scheduling.schedulingTime}</td>
+                    {scheduling.map((schedule, index) => (
+                        <tr key={index}>
+                            <td>{schedule.id}</td>
+                            <td>{schedule.name}</td>
+                            <td>{schedule.birthDate}</td>
+                            <td>{schedule.schedulingDateTime}</td>
                             <td>
                             <Switch
                                 onClick={() => attended()}
@@ -61,7 +60,7 @@ const Appointment = () => {
                             />
                             </td>
                         </tr>
-                    {/* ))} */}
+                    ))} 
                 </tbody>
             </Table>
 
