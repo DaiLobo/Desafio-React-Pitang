@@ -3,6 +3,8 @@ import { showNotification } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "../../services/api";
+import dayjs from "dayjs";
+
 
 const Appointment = () => {
 
@@ -50,6 +52,19 @@ const Appointment = () => {
             })
         }
     }
+
+    function sortByDate (a, b) {
+        a = dayjs(a.schedulingDateTime).toDate();
+        b = dayjs(b.schedulingDateTime).toDate();
+       
+        return a.getTime() - b.getTime();
+    }
+
+    scheduling.sort(sortByDate) //ordenação por data e hora
+
+    // const teste = dayjs(scheduling[0].schedulingDateTime).toDate();
+    // const teste2 = teste.getTime();
+    // console.log(teste2)
 
     // const scheduling = {
     //     id: 1,
@@ -111,7 +126,8 @@ const Appointment = () => {
                             }
                             </td>
                         </tr>
-                    ))} 
+                    ))
+                    } 
                 </tbody>
             </Table>
 
