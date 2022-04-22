@@ -10,14 +10,16 @@ const Appointment = () => {
 
     const [scheduling, setScheduling] = useState([]);
     const [checked] = useState(true);
-    //const [value, setValue] = useState(true);
+
     const navigate = useNavigate();
 
     const onChange = ({target: {name, value}}) => {
+
         setScheduling({
-            ...scheduling, //spread operator - copia todos os valores do objeto, para não ficar substituindo
+            ...scheduling,
             [name]: value,
         });
+
     };
 
     useEffect(() => {
@@ -26,10 +28,8 @@ const Appointment = () => {
 
     }, []);
 
-    //console.log(value)
-
     const isAttended = async (schedule) => {
-       
+
         const scheduled = {
             ...schedule,
             attended: true,
@@ -62,16 +62,11 @@ const Appointment = () => {
 
     scheduling.sort(sortByDate) //ordenação por data e hora
 
-    // const teste = dayjs(scheduling[0].schedulingDateTime).toDate();
-    // const teste2 = teste.getTime();
-    // console.log(teste2)
-
     // const scheduling = {
     //     id: 1,
     //     name: "Diana",
     //     birthdate: "09/06/1998",
-    //     schedulingDate: "15/04/2022",
-    //     schedulingTime: "16h"
+    //     schedulingDateTime: "15/04/2022 15:00",
     // }
    
     return (
@@ -111,13 +106,9 @@ const Appointment = () => {
                                     <Chip color="indigo" variant="filled"
                                         name="attended"
                                         label="Attended"
-                                        //
-                                        //value="attended"
                                         value={schedule.attended}
-                                        //onChange={setValue}
                                         onClick={() => isAttended(schedule)}
                                         onChange={(value) => onChange({target: {name: "attended", value}})}
-
                                     >
                                             Attended
                                     </Chip>

@@ -7,11 +7,11 @@ import Router from './Router';
 
 ReactDOM.render(
   <MantineProvider>
-    <ColorSchemeProvider>
-      <NotificationsProvider>
-          <Router />
-      </NotificationsProvider>
-    </ColorSchemeProvider>
+      <ColorSchemeProvider>
+        <NotificationsProvider>
+            <Router />
+        </NotificationsProvider>
+      </ColorSchemeProvider>
   </MantineProvider>,
   document.getElementById('root')
 );
