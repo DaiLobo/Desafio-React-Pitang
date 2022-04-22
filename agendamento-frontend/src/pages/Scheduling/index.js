@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import dayjs from "dayjs";
 import axios from "../../services/api";
-import { Button, Title, Space, Select, InputWrapper, Input, Text} from "@mantine/core";
+import { Button, Title, Space, InputWrapper, Input, Text} from "@mantine/core";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { AlertCircle, Calendar, Vaccine } from 'tabler-icons-react';
@@ -111,7 +111,7 @@ const SchedulingForm = ({form, setForm}) => {
             icon={<Calendar size={16} />}
         />
 
-        <Text mb={2} mt={8} weight={500} size="sm">Scheduling Date</Text>
+        <Text mb={2} mt={8} weight={500} size="sm">Scheduling Date and Time</Text>
         <DatePicker
             id="schedulingDateTime"
             name="schedulingDateTime"
@@ -222,9 +222,9 @@ const Scheduling = () => {
         })
 
         try {
+            notification();
             await schema.validate(scheduling);
             await axios.post("/schedule", scheduling);
-            notification();
             return true;
         } catch (error){
             errorNotification();

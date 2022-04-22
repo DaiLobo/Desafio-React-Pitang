@@ -1,14 +1,22 @@
-import {Button, Space, Switch, Table, Title} from "@mantine/core";
-import { useNavigate, useParams } from "react-router-dom";
+import {Button, Chip, Chips, Space, Table, Title} from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "../../services/api";
 
 const Appointment = () => {
 
-    const {scheduleId} = useParams();
     const [scheduling, setScheduling] = useState([]);
-    const [checked, setChecked] = useState(false);
+    const [checked, setChecked] = useState(true);
+    const [value, setValue] = useState(true);
     const navigate = useNavigate();
+
+    const onChange = ({target: {name, value}}) => {
+        setScheduling({
+            ...scheduling, //spread operator - copia todos os valores do objeto, para não ficar substituindo
+            [name]: value,
+        });
+    };
 
     useEffect(() => {
         
@@ -16,10 +24,33 @@ const Appointment = () => {
 
     }, []);
 
-    console.log(checked)
+    //console.log(value)
 
-    const attended = async (checked) => {
-        await axios.put(`/schedule/${scheduleId}`, checked); //colocar id
+    const isAttended = async (schedule) => {
+       
+        const scheduled = {
+            ...schedule,
+            attended: true,
+        }
+
+        //axios.put(`/schedule/${scheduling.id}`, setScheduling);
+
+        try {
+            
+            await axios.put(`/schedule/${schedule.id}`, scheduled);
+
+            showNotification({
+                title: "Success",
+                message: "Attended user",
+            })
+
+        } catch (error) {
+            showNotification({
+                title: "Error",
+                message: error.response.data.message,
+                color: "red"
+            })
+        }
     }
 
     // const scheduling = {
@@ -49,15 +80,25 @@ const Appointment = () => {
                             <td>{schedule.id}</td>
                             <td>{schedule.name}</td>
                             <td>{schedule.birthDate}</td>
-                            <td>{schedule.schedulingDateTime}</td>
+                            <td>{schedule.schedulingDateTime}</td>{console.log(schedule.attended)}
                             <td>
-                            <Switch
-                                onClick={() => attended()}
-                                label="Attended"
-                                color="indigo"
-                                checked={checked}
-                                onChange={(event) => setChecked(event.currentTarget.checked)}
-                            />
+                                <Chips color="indigo" variant="filled">
+                                       
+                                    <Chip
+                                        name="attended"
+                                        //checked={checked}
+                                        //value="attended"
+                                        value={schedule.attended}
+                                        //onChange={setValue}
+                                        onClick={() => isAttended(schedule)}
+                                        onChange={(value) => onChange({target: {name: "attended", value}})}
+
+                                    >
+                                            Attended
+                                    </Chip>
+                                    
+                                </Chips>
+                                
                             </td>
                         </tr>
                     ))} 
