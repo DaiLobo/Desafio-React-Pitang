@@ -7,8 +7,8 @@ import axios from "../../services/api";
 const Appointment = () => {
 
     const [scheduling, setScheduling] = useState([]);
-    const [checked, setChecked] = useState(true);
-    const [value, setValue] = useState(true);
+    const [checked] = useState(true);
+    //const [value, setValue] = useState(true);
     const navigate = useNavigate();
 
     const onChange = ({target: {name, value}}) => {
@@ -32,8 +32,6 @@ const Appointment = () => {
             ...schedule,
             attended: true,
         }
-
-        //axios.put(`/schedule/${scheduling.id}`, setScheduling);
 
         try {
             
@@ -82,11 +80,23 @@ const Appointment = () => {
                             <td>{schedule.birthDate}</td>
                             <td>{schedule.schedulingDateTime}</td>{console.log(schedule.attended)}
                             <td>
-                                <Chips color="indigo" variant="filled">
-                                       
+                            { schedule.attended ?
                                     <Chip
+                                        color="indigo" variant="filled"
+                                        checked={checked}
+                                        value="attended"
+                                    >
+                                            Attended
+                                    </Chip> 
+
+                                    : 
+
+                                <Chips color="indigo" variant="filled">
+
+                                    <Chip color="indigo" variant="filled"
                                         name="attended"
-                                        //checked={checked}
+                                        label="Attended"
+                                        //
                                         //value="attended"
                                         value={schedule.attended}
                                         //onChange={setValue}
@@ -96,9 +106,9 @@ const Appointment = () => {
                                     >
                                             Attended
                                     </Chip>
-                                    
+                                   
                                 </Chips>
-                                
+                            }
                             </td>
                         </tr>
                     ))} 
