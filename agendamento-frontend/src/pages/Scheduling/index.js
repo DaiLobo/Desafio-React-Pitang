@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import dayjs from "dayjs";
 import axios from "../../services/api";
+import { useNavigate } from "react-router-dom";
 import { Button, Title, Space, InputWrapper, Input, Text} from "@mantine/core";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,12 +13,7 @@ import { useEffect, useState } from "react";
 const DATA_FORM_KEY = "data_form";
 
 const voucher = [];
-const day = [];
-const limitDays = [];
-const hour = [];
 const limitHours = [];
-
-
 
 // const hours = this.createRef();
 
@@ -124,7 +120,9 @@ const Scheduling = () => {
     const [form, setForm] = useState(getSaveInfo);
     const [saveData, setSaveData] = useState([]);
 
-    const chosenHour = form.schedulingDateTime.getTime();
+    const time = saveData.map(element => `${element.schedulingDateTime}`) //datas salvas no backend
+
+    const navigate = useNavigate();
 
     //Salvando no localStorage
     useEffect(() => {
@@ -185,20 +183,17 @@ const Scheduling = () => {
     //Limite de 20 agendamentos por dia
     function limitSchedulesDay () {
 
-        const chosenDay = form.schedulingDateTime.getDate();
-        day.push(chosenDay);
-
-        console.log(chosenDay)
-        console.log("array que contem os dias escolhidos")
-        console.log(day)
+        const chosenDay = dayjs(form.schedulingDateTime).format('YYYY/M/D'); //formatando data que foi escolhida no formulário
         
-        const limitDay = day.filter(element => element === chosenDay)
-        console.log("array com os dias iguais " + limitDay)
+        const dateString = time.map(element => element.split(" ")) //separando as datas das horas dos agendamentos já realizados
+        const dayString = dateString.map(element => element[0]) //pegando somente as datas
+        const dayMonthYear = dayString.map(element => element.split('/')) //separando dia, mês e ano
+        const date = dayMonthYear.map(element => new Date(element[0], element[1]-1, element[2])) //transformado para date
+        const dateFormated = date.map(element => dayjs(element).format('YYYY/M/D')) //formatando data para ser compativel com a escolhida
+     
+        const limitDay = dateFormated.filter(element => element === chosenDay)
 
         if (limitDay.length >= 20 ){
-            console.log("limite de agendamentos por dia alcançado")
-            limitDays.push(limitDay[0])
-            console.log(limitDays)
 
             showNotification({
                 icon: <AlertCircle />,
@@ -215,21 +210,13 @@ const Scheduling = () => {
     //Limite de dois agendamentos por hora
     function limitSchedulesHour () {
 
-        //FAZER UM FILTRO DA DATA DO FORMULARIO COM O ARRAY Q CONTEM AS INFORMAÇÕES
-        //VER O TAMANHO
-        //PRONTO
-
-        const time = saveData.map(element => `${element.schedulingDateTime}`) //datas salvas no backend
         const timeFormated = time.map(element => Date.parse(element)) //convertendo para getTime
 
         const limitHour = timeFormated.filter(element => { //filtrando os valores que são iguais a data escolhida
             if (element === ((form.schedulingDateTime).getTime())){
                 return element;
             }
-        })
-        console.log(timeFormated)
-        console.log(limitHour)
-        
+        })        
 
         if (limitHour.length >= 2 ){
             console.log("limite de agendamentos por hora alcançado")
@@ -250,6 +237,7 @@ const Scheduling = () => {
     function excludePastTimes () {
         
         const currentTime = new Date().getTime();
+        const chosenHour = form.schedulingDateTime.getTime();
 
         if (chosenHour <= currentTime){
             showNotification({
@@ -273,27 +261,6 @@ const Scheduling = () => {
             schedulingDateTime: dayjs(form.schedulingDateTime).format('YYYY/M/D HH:mm'),
         };
 
-
-        //const timeFormated = time.map(element => new Date(Date.parse(element)))
-        // const hours = time.map(element => element.split(" ")[1])
-        // const date = time.map(element => element.split(" ")[0]) //day
-
-        //console.log(time)
-        //console.log(timeFormated)
-        //console.log(timeFormated[0].getTime()) //deixa no formato de hora
-        // console.log(hours)
-        // console.log(date)
-
-        // const hour = hours.map(element => element.split(':')[0])
-        // const minute = hours.map(element => element.split(':')[1])
-        // console.log(hour)
-        // console.log(minute)
-
-        // const hourMinute = new Date(hour, "00")
-        // console.log(hourMinute)
-
-
-
         if(!form.name ) {
             return showNotification({
                 icon: <AlertCircle />,
@@ -309,11 +276,10 @@ const Scheduling = () => {
 
         voucher.push(scheduling); //passo o objeto com as informações do formulário para um array
 
-
         //Validação antes de enviar o formulário para o back
         if(!(await validate(scheduling))) return;
 
-
+        navigate("/")
 
     };
 
