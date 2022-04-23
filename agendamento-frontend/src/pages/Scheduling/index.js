@@ -122,6 +122,7 @@ const SchedulingForm = ({form, setForm}) => {
 const Scheduling = () => {
 
     const [form, setForm] = useState(getSaveInfo);
+    const [saveData, setSaveData] = useState([]);
 
     const chosenHour = form.schedulingDateTime.getTime();
 
@@ -129,6 +130,17 @@ const Scheduling = () => {
     useEffect(() => {
         localStorage.setItem(DATA_FORM_KEY, JSON.stringify(form))
     }, [form])
+
+
+
+    //Pegando as informações do backend
+    useEffect(() => {    
+        axios.get("/schedule").then((response) => setSaveData(response.data));
+    }, []);
+
+
+
+
     
     //Notificações
     function notification() {
@@ -142,15 +154,13 @@ const Scheduling = () => {
 
     function errorNotification() {
 
-        if(!form.name ) {
-            return showNotification({
-                icon: <AlertCircle />,
-                title: "Error",
-                message: `Empty ${!form.name} name field`,
-                color: 'red',
-            }); 
-        }
-       
+        return showNotification({
+            icon: <AlertCircle />,
+            title: "Error",
+            message: `Something is wrong`,
+            color: 'red',
+        }); 
+    
     }
 
     //Validação
@@ -162,9 +172,9 @@ const Scheduling = () => {
         })
 
         try {
-            notification();
             await schema.validate(scheduling);
             await axios.post("/schedule", scheduling);
+            notification();
             return true;
         } catch (error){
             errorNotification();
@@ -205,17 +215,24 @@ const Scheduling = () => {
     //Limite de dois agendamentos por hora
     function limitSchedulesHour () {
 
-        //Array que vai conter as horas escolhidas em milisegundos
-        hour.push(chosenHour);
-        
-        //array que vai filtrar as horas iguais
-        const limitHour = hour.filter(element => element === chosenHour)
-        console.log("array com os horas iguais " + limitHour)
+        //FAZER UM FILTRO DA DATA DO FORMULARIO COM O ARRAY Q CONTEM AS INFORMAÇÕES
+        //VER O TAMANHO
+        //PRONTO
 
-        if (limitHour.length >= 3 ){
+        const time = saveData.map(element => `${element.schedulingDateTime}`) //datas salvas no backend
+        const timeFormated = time.map(element => Date.parse(element)) //convertendo para getTime
+
+        const limitHour = timeFormated.filter(element => { //filtrando os valores que são iguais a data escolhida
+            if (element === ((form.schedulingDateTime).getTime())){
+                return element;
+            }
+        })
+        console.log(timeFormated)
+        console.log(limitHour)
+        
+
+        if (limitHour.length >= 2 ){
             console.log("limite de agendamentos por hora alcançado")
-            limitHours.push(limitHour[0])
-            console.log(limitHours)
 
             showNotification({
                 icon: <AlertCircle />,
@@ -255,6 +272,36 @@ const Scheduling = () => {
             birthDate: dayjs(form.birthDate).format('YYYY/MM/DD'),
             schedulingDateTime: dayjs(form.schedulingDateTime).format('YYYY/M/D HH:mm'),
         };
+
+
+        //const timeFormated = time.map(element => new Date(Date.parse(element)))
+        // const hours = time.map(element => element.split(" ")[1])
+        // const date = time.map(element => element.split(" ")[0]) //day
+
+        //console.log(time)
+        //console.log(timeFormated)
+        //console.log(timeFormated[0].getTime()) //deixa no formato de hora
+        // console.log(hours)
+        // console.log(date)
+
+        // const hour = hours.map(element => element.split(':')[0])
+        // const minute = hours.map(element => element.split(':')[1])
+        // console.log(hour)
+        // console.log(minute)
+
+        // const hourMinute = new Date(hour, "00")
+        // console.log(hourMinute)
+
+
+
+        if(!form.name ) {
+            return showNotification({
+                icon: <AlertCircle />,
+                title: "Error",
+                message: `Empty name field`,
+                color: 'red',
+            }); 
+        }
                
         if (excludePastTimes()) return;
         if (limitSchedulesHour()) return;
