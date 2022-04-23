@@ -4,7 +4,7 @@ import axios from "../../services/api";
 import { Button, Title, Space, InputWrapper, Input, Text} from "@mantine/core";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { AlertCircle, Calendar, Vaccine } from 'tabler-icons-react';
+import { AlertCircle, Vaccine } from 'tabler-icons-react';
 import { showNotification } from '@mantine/notifications';
 import { useEffect, useState } from "react";
 
@@ -12,14 +12,12 @@ import { useEffect, useState } from "react";
 const DATA_FORM_KEY = "data_form";
 
 const voucher = [];
-//let limit = [{name: '', birthDate: new Date(), schedulingDateTime: new Date(), schedulingTime: '',}]
 const day = [];
 const limitDays = [];
+const hour = [];
+const limitHours = [];
 
 
-const time = Array(24).fill(0).map((_, index) => {
-   return {name: `${index}:00h`, disabled: false, count: 0}
-});
 
 // const hours = this.createRef();
 
@@ -45,10 +43,7 @@ function getSaveInfo () {
 }
 
 
-const SchedulingForm = ({form, setForm}) => {
-    
-    // const date = new Date();
-    // const now = dayjs().toDate();    
+const SchedulingForm = ({form, setForm}) => {  
 
     const onChange = (event) => {
         const {
@@ -61,17 +56,6 @@ const SchedulingForm = ({form, setForm}) => {
         }));
 
     };
-
-      // function handleDate(limit){
-    //     if(limit.length >= 20){
-    //         return true;
-    //     }
-    // }
-    // useEffect(() => {
-    //     if (!form.schedulingTime){
-    //         isValidated = false;
-    //     }
-    // }, [])
 
 
     return (
@@ -103,12 +87,10 @@ const SchedulingForm = ({form, setForm}) => {
             showYearDropdown
             showMonthDropdown
             dropdownMode="select"
-            //scrollableMonthYearDropdown
             mb={8}
             required={true}
             placeholderText="Select Birthdate"
             label="Birthdate"
-            icon={<Calendar size={16} />}
         />
 
         <Text mb={2} mt={8} weight={500} size="sm">Scheduling Date and Time</Text>
@@ -123,37 +105,14 @@ const SchedulingForm = ({form, setForm}) => {
             dateFormat="yyyy/MM/dd h:mm aa"
             showTimeSelect
             timeIntervals={60}
-            //minTime={new Date(new Date().setHours(new Date().getHours(), new Date().getMinutes())}
-            //minTime={setHours(setMinutes(new Date(), 0), 17)}
+            //minTime={setHours(setMinutes(new Date(), 0), 10)}
             placeholderText="Click to select a date"
             // label="Scheduling Date"
             minDate={new Date()}
             excludeDates={[]}
-            // excludeTimes={[
-            //     setHours(setMinutes(new Date(), 0), 17),
-            //     setHours(setMinutes(new Date(), 30), 18),
-            //     setHours(setMinutes(new Date(), 30), 19),
-            //     setHours(setMinutes(new Date(), 30), 17),
-            //   ]}
+            excludeTimes={limitHours}
             withPortal // dropdownType="modal"
         />
-        
-        {/* <Select
-            id="schedulingTime"
-            name="schedulingTime"
-            icon={<Clock size={16} />}
-            mt={8}
-            value={form.schedulingTime}
-            onChange={(value) => onChange({ target: { name: "schedulingTime", value } })}
-            required
-            label="Choose the time of scheduling"
-            placeholder="Time"
-            data={
-                time.map((hour) => (
-                {value: hour.name, label: hour.name, disabled: hour.disabled}
-                ))
-            }
-        /> */}
          
     </>
     )
@@ -164,35 +123,16 @@ const Scheduling = () => {
 
     const [form, setForm] = useState(getSaveInfo);
 
+    const chosenHour = form.schedulingDateTime.getTime();
+
     //Salvando no localStorage
-    
     useEffect(() => {
         localStorage.setItem(DATA_FORM_KEY, JSON.stringify(form))
     }, [form])
     
     //Notificações
-    
     function notification() {
-        const selected = time.findIndex((select) => select.name === voucher[voucher.length-1].schedulingTime); //encontro o index do select escolhido
-
-        if(selected >= 0) {
-            
-            time[selected].count++;
-            
-            if (time[selected].count === 2){
-                time[selected].disabled = true;
-            }
-            
-            if (time[selected].count >= 3){
-                return showNotification({
-                    icon: <AlertCircle />,
-                    title: "Error",
-                    message: "Unavailable hours" ,
-                    color: 'red',
-                });
-            }    
-        }
-        return showNotification({
+        showNotification({
             icon: < Vaccine />,
             title: "Success",
             message: "Scheduling successful: write down the day and time of your appointment" ,
@@ -232,8 +172,7 @@ const Scheduling = () => {
         }
     }
 
-
-    //limite de 20 agendamentos por dia
+    //Limite de 20 agendamentos por dia
     function limitSchedulesDay () {
 
         const chosenDay = form.schedulingDateTime.getDate();
@@ -251,15 +190,63 @@ const Scheduling = () => {
             limitDays.push(limitDay[0])
             console.log(limitDays)
 
-            return showNotification({
+            showNotification({
                 icon: <AlertCircle />,
                 title: "Error",
                 message: "Unavailable day" ,
                 color: 'red',
             });
+
+            return true;
         }
 
     }
+
+    //Limite de dois agendamentos por hora
+    function limitSchedulesHour () {
+
+        //Array que vai conter as horas escolhidas em milisegundos
+        hour.push(chosenHour);
+        
+        //array que vai filtrar as horas iguais
+        const limitHour = hour.filter(element => element === chosenHour)
+        console.log("array com os horas iguais " + limitHour)
+
+        if (limitHour.length >= 3 ){
+            console.log("limite de agendamentos por hora alcançado")
+            limitHours.push(limitHour[0])
+            console.log(limitHours)
+
+            showNotification({
+                icon: <AlertCircle />,
+                title: "Error",
+                message: "Unavailable hour" ,
+                color: 'red',
+            });
+
+            return true;
+        }
+
+    }
+
+    //Hora q já passou do dia atual
+    function excludePastTimes () {
+        
+        const currentTime = new Date().getTime();
+
+        if (chosenHour <= currentTime){
+            showNotification({
+                icon: <AlertCircle />,
+                title: "Error",
+                message: "That time has already passed" ,
+                color: 'red',
+            });
+
+            return true;
+        }
+
+    }
+
 
     const onSubmit = async () => {
 
@@ -268,37 +255,16 @@ const Scheduling = () => {
             birthDate: dayjs(form.birthDate).format('YYYY/MM/DD'),
             schedulingDateTime: dayjs(form.schedulingDateTime).format('YYYY/M/D HH:mm'),
         };
-
-                    
-
-        limitSchedulesDay();
+               
+        if (excludePastTimes()) return;
+        if (limitSchedulesHour()) return;
+        if (limitSchedulesDay()) return;
 
         voucher.push(scheduling); //passo o objeto com as informações do formulário para um array
 
 
-        //Limite de 20 agendamentos por dia
-        // function dayLimit (data) {
-        //     return data.schedulingDateTime === scheduling.schedulingDateTime;
-        // }
-        // limit = voucher.filter(dayLimit) //filtra todos os elementos que tem o mesmo dia que foi escolhido
-
-        // console.log(limit.length)
-        // console.log(voucher)   
-        //console.log(hours.current)
-
-
         //Validação antes de enviar o formulário para o back
         if(!(await validate(scheduling))) return;
-
-
-        //FAZER A REQUISIÇÃO PARA O BACK
-        // try {
-        //     if(!(await validate())) {
-        //         await axios.put(`/ticket/${form.id}`, form);
-        //     }
-        // } catch(error) {
-
-        // }
 
 
 
