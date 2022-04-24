@@ -279,7 +279,7 @@ const Scheduling = () => {
         //Validação antes de enviar o formulário para o back
         if(!(await validate(scheduling))) return;
 
-        navigate("/")
+        navigate("/appointment")
 
     };
 
