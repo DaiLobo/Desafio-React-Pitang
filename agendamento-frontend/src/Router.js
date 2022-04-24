@@ -10,7 +10,6 @@ const Router = () => {
         <Routes>
             <Route path="/" element={<Layout/>}>
                 <Route element={<Scheduling/>} index />
-                {/* <Route path="/scheduling" element={<Scheduling/>} /> */}
                 <Route path="/appointment" element={<Appointment/>} />
             </Route>
         </Routes>

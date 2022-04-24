@@ -12,14 +12,7 @@ import { useEffect, useState } from "react";
 
 const DATA_FORM_KEY = "data_form";
 
-const voucher = [];
-const limitHours = [];
-
-// const hours = this.createRef();
-
-
 //Pegando info do localStorage
-
 function getSaveInfo () {
     const saveInfoStorage = localStorage.getItem(DATA_FORM_KEY)
 
@@ -101,13 +94,9 @@ const SchedulingForm = ({form, setForm}) => {
             dateFormat="yyyy/MM/dd h:mm aa"
             showTimeSelect
             timeIntervals={60}
-            //minTime={setHours(setMinutes(new Date(), 0), 10)}
             placeholderText="Click to select a date"
-            // label="Scheduling Date"
             minDate={new Date()}
-            excludeDates={[]}
-            excludeTimes={limitHours}
-            withPortal // dropdownType="modal"
+            withPortal 
         />
          
     </>
@@ -129,17 +118,11 @@ const Scheduling = () => {
         localStorage.setItem(DATA_FORM_KEY, JSON.stringify(form))
     }, [form])
 
-
-
     //Pegando as informações do backend
     useEffect(() => {    
         axios.get("/schedule").then((response) => setSaveData(response.data));
     }, []);
 
-
-
-
-    
     //Notificações
     function notification() {
         showNotification({
@@ -219,7 +202,6 @@ const Scheduling = () => {
         })        
 
         if (limitHour.length >= 2 ){
-            console.log("limite de agendamentos por hora alcançado")
 
             showNotification({
                 icon: <AlertCircle />,
@@ -273,8 +255,6 @@ const Scheduling = () => {
         if (excludePastTimes()) return;
         if (limitSchedulesHour()) return;
         if (limitSchedulesDay()) return;
-
-        voucher.push(scheduling); //passo o objeto com as informações do formulário para um array
 
         //Validação antes de enviar o formulário para o back
         if(!(await validate(scheduling))) return;

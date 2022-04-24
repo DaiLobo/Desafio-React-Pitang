@@ -88,7 +88,7 @@ const Appointment = () => {
                             <td>{schedule.id}</td>
                             <td>{schedule.name}</td>
                             <td>{schedule.birthDate}</td>
-                            <td>{schedule.schedulingDateTime}</td>{console.log(schedule.attended)}
+                            <td>{schedule.schedulingDateTime}</td>
                             <td>
                             { schedule.attended ?
                                     <Chip
@@ -123,7 +123,7 @@ const Appointment = () => {
             </Table>
 
             <Space h="xl"/>
-            <Button onClick={() => navigate("/scheduling")} 
+            <Button onClick={() => navigate("/")} 
                     variant="gradient" 
                     gradient={{ from: 'indigo', to: 'cyan' }} 
                     size="sm">
