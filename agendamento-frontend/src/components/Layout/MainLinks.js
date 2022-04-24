@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, CalendarEvent, ClipboardList } from "tabler-icons-react";
+import { CalendarEvent, ClipboardList } from "tabler-icons-react";
 import { ThemeIcon, UnstyledButton, Group, Text } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
@@ -38,9 +38,8 @@ function MainLink({ icon, color, label, path }) {
 }
 
 const routes = [
-    {icon: <Home size={16} />, color: "blue", label: "Home", path: "/" },
-    {icon: <CalendarEvent size={16} />, color: "teal", label: "Agendamento de Pacientes", path: "/scheduling"},
-    {icon: <ClipboardList size={16} />, color: "violet", label: "Consulta dos Agendamentos", path: "/appointment"},    
+    {icon: <CalendarEvent size={16} />, color: "teal", label: "Patients Scheduling", path: "/"},
+    {icon: <ClipboardList size={16} />, color: "violet", label: "Consultation of Schedules", path: "/appointment"},    
 ]
 
 export default function MainLinks() {
