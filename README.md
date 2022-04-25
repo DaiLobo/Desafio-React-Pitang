@@ -22,7 +22,7 @@ npm install
 Run the project:
 
 ```
-yarn
+yarn start
 #or
 npm run
 ```
